@@ -29,7 +29,7 @@ class HomeController{
 
     private static final String MESSAGE ="<getCurriculoCompactado>\n" +
             "         <id>0917360107022796</id>\n" +
-            "      </   getCurriculoCompactado>";
+            "      </getCurriculoCompactado>";
 
     private final WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
 

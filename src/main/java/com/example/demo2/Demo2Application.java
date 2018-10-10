@@ -27,9 +27,14 @@ public class Demo2Application {
 @RestController
 class HomeController{
 
-    private static final String MESSAGE ="<getCurriculoCompactado>\n" +
+    private static final String MESSAGE ="<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ws=\"http://ws.servico.repositorio.cnpq.br/\">\n" +
+            "   <soapenv:Header/>\n" +
+            "   <soapenv:Body>\n" +
+            "      <ws:getCurriculoCompactado>\n" +
             "         <id>0917360107022796</id>\n" +
-            "      </getCurriculoCompactado>";
+            "      </ws:getCurriculoCompactado>\n" +
+            "   </soapenv:Body>\n" +
+            "</soapenv:Envelope>";
 
     private final WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
 

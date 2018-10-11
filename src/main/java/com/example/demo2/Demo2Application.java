@@ -1,5 +1,10 @@
 package com.example.demo2;
 
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Path;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,9 +37,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 @SpringBootApplication
 public class Demo2Application {
@@ -98,75 +107,42 @@ class HomeController{
     }
 
 
-    public void customSendAndReceive() {
+    public void customSendAndReceive() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
 
+        //Request
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT,"text/xml;charset=UTF-8");
         headers.set(HttpHeaders.CONTENT_TYPE,"text/xml;charset=UTF-8");
-        headers.set(HttpHeaders.ACCEPT_ENCODING,"gzip,deflate");
-
-//        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-//        map.add("user", authentication.getName());
-//        map.add("password", authentication.getCredentials().toString());
-
+        headers.set(HttpHeaders.ACCEPT_ENCODING,"gzip");
         HttpEntity<String> request = new HttpEntity(MESSAGE, headers);
 
-        String remoteAuth = restTemplate.postForObject(url, request ,String.class);
-        System.out.println(remoteAuth);
+        //Response
+        String responseString = restTemplate.postForObject(url, request ,String.class);
 
-//        JsonElement jelement = new JsonParser().parse(remoteAuth);
-//        return jelement.getAsJsonObject().get("result").getAsString();
-    }
+        //Serialize response XML
+        Serializer serializer=new Persister();
+        Response resp = serializer.read(Response.class, responseString);
 
-    // send to an explicit URI
-    public void customSendAndReceive2() {
+        //Unzip
+        byte[] data = Base64ZlibCodec.decode(resp.getResponse());
 
-
-        MultiValueMap headers = new HttpHeaders();
-        headers.set(HttpHeaders.ACCEPT,"text/xml;charset=UTF-8");
-        headers.set(HttpHeaders.CONTENT_TYPE,"text/xml;charset=UTF-8");
-        headers.set(HttpHeaders.ACCEPT_ENCODING,"gzip,deflate");
-        headers.set("SOAPAction", "SOAPAction:");
-        HttpEntity<SOAPEnvelope> soapEntity = null;
-        try {
-            soapEntity = new HttpEntity<>(createSoapEnvelope(),headers);
-        } catch (SOAPException e) {
-            e.printStackTrace();
-        }
-
-        RestTemplate restTemplate =  new RestTemplate();
-        //Create a list for the message converters
-//        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
-//        //Add the String Message converter
-//        messageConverters.add(new StringHttpMessageConverter());
-//        //Add the message converters to the restTemplate
-//        restTemplate.setMessageConverters(messageConverters);
-
-
-        //HttpHeaders headers = new HttpHeaders();
-        //headers.setContentType(MediaType.APPLICATION_XML);
-        //HttpEntity<String> request = new HttpEntity<String>(MESSAGE, headers);
-
-        ResponseEntity<SOAPEnvelope> future=
-                restTemplate.postForEntity("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo"
-                        ,soapEntity, SOAPEnvelope.class);
-
-
-        //final ResponseEntity<String> response = restTemplate.postForEntity("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo", request, String.class);
-
-//        System.out.println(future);
-//
-//
-//        StreamSource source = new StreamSource(new StringReader(MESSAGE));
-//        StreamResult result = new StreamResult(System.out);
-//        webServiceTemplate.sendSourceAndReceiveToResult("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo",
-//                source, result);
     }
 
 
     @GetMapping("")
-    public void home(){
+    public void home() throws Exception {
         customSendAndReceive();
+    }
+}
+
+@Root(name = "env:Envelope", strict = false)
+class Response {
+    @Element(name = "return")
+    @Path("Body/getCurriculoCompactadoResponse")
+    private String response;
+
+    public String getResponse() {
+        return response;
     }
 }

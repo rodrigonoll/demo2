@@ -120,9 +120,13 @@ class HomeController{
         //Response
         String responseString = restTemplate.postForObject(url, request ,String.class);
 
+        System.out.println("\n\nResponse String:\n\n " + responseString);
+
         //Serialize response XML
         Serializer serializer=new Persister();
         Response resp = serializer.read(Response.class, responseString);
+
+        System.out.println("\n\nSubstr:\n\n " + resp.getResponse());
 
         //Unzip
         byte[] data = Base64ZlibCodec.decode(resp.getResponse());

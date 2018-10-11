@@ -102,15 +102,18 @@ class HomeController{
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.set(HttpHeaders.ACCEPT,"text/xml;charset=UTF-8");
+        headers.set(HttpHeaders.CONTENT_TYPE,"text/xml;charset=UTF-8");
+        headers.set(HttpHeaders.ACCEPT_ENCODING,"gzip,deflate");
 
 //        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
 //        map.add("user", authentication.getName());
 //        map.add("password", authentication.getCredentials().toString());
 
-        HttpEntity<String> request = new HttpEntity(MESSAGE);
+        HttpEntity<String> request = new HttpEntity(MESSAGE, headers);
 
         String remoteAuth = restTemplate.postForObject(url, request ,String.class);
+        System.out.println(remoteAuth);
 
 //        JsonElement jelement = new JsonParser().parse(remoteAuth);
 //        return jelement.getAsJsonObject().get("result").getAsString();

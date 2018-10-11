@@ -112,9 +112,9 @@ class HomeController{
 
         //Request
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.ACCEPT,"text/xml;charset=UTF-8");
+        //headers.set(HttpHeaders.ACCEPT,"text/xml;charset=UTF-8");
         headers.set(HttpHeaders.CONTENT_TYPE,"text/xml;charset=UTF-8");
-        headers.set(HttpHeaders.ACCEPT_ENCODING,"gzip");
+        //headers.set(HttpHeaders.ACCEPT_ENCODING,"gzip");
         HttpEntity<String> request = new HttpEntity(MESSAGE, headers);
 
         //Response
